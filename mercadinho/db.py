@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sqlite3
+import os
 
 import click
 from flask import current_app, g
@@ -37,7 +38,7 @@ def init_app(app) -> None:
     app.cli.add_command(init_db_command)
     app.cli.add_command(create_user_command)
     app.cli.add_command(seed_demo_command)
-
+    app.cli.add_command(create_demo_user_command)
 
 @click.command("init-db")
 def init_db_command() -> None:
@@ -90,3 +91,38 @@ def seed_demo_command() -> None:
             inserted += 1
     db.commit()
     click.echo(f"Produtos de demonstração adicionados: {inserted}. Dados totalmente fictícios.")
+
+@click.command("create-demo-user")
+def create_demo_user_command() -> None:
+    """Cria o usuário de demonstração se ele ainda não existir."""
+    username = os.environ.get("DEMO_USERNAME", "teste")
+    password = os.environ.get("DEMO_PASSWORD")
+
+    if not password:
+        raise click.ClickException(
+            "Configure a variável de ambiente DEMO_PASSWORD."
+        )
+
+    db = get_db()
+    existing_user = db.execute(
+        "SELECT 1 FROM users WHERE username = ?",
+        (username,),
+    ).fetchone()
+
+    if existing_user:
+        click.echo(f"O usuário '{username}' já existe; nenhuma alteração feita.")
+        return
+
+    try:
+        db.execute(
+            "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+            (username, generate_password_hash(password)),
+        )
+        db.commit()
+    except sqlite3.IntegrityError as error:
+        db.rollback()
+        raise click.ClickException(
+            "Não foi possível criar o usuário de demonstração."
+        ) from error
+
+    click.echo(f"Usuário de demonstração '{username}' criado.")
