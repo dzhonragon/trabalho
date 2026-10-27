@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Nova movimentação{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading"><div><p class="eyebrow">ENTRADAS E SAÍDAS</p><h1>Nova movimentação</h1><p class="muted">Registre uma mudança de quantidade. O saldo será atualizado após a validação.</p></div><a class="button button-quiet" href="{{ url_for('main.dashboard') }}">← Voltar ao estoque</a></section>
+<section class="panel form-panel" aria-labelledby="movement-form-title">
+  <h2 id="movement-form-title">Dados da movimentação</h2>
+  {% if not products %}
+    <div class="empty-state"><h3>Cadastre um produto primeiro</h3><p>É necessário haver pelo menos um produto para registrar uma movimentação.</p><a class="button button-primary" href="{{ url_for('main.new_product') }}">Cadastrar produto</a></div>
+  {% else %}
+  <form method="post" action="{{ url_for('main.new_movement') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-grid">
+      <div class="form-field form-field-full"><label for="product_id">Produto <span class="required">*</span></label><select id="product_id" name="product_id" required><option value="">Selecione um produto</option>{% for product in products %}<option value="{{ product.id }}" {% if form.get('product_id', '')|string == product.id|string %}selected{% endif %}>{{ product.name }} ({{ product.code }}) — saldo: {{ product.quantity }}</option>{% endfor %}</select></div>
+      <div class="form-field"><label for="type">Tipo de movimentação <span class="required">*</span></label><select id="type" name="type" required><option value="">Selecione</option><option value="entrada" {% if form.get('type') == 'entrada' %}selected{% endif %}>Entrada — adicionar ao estoque</option><option value="saida" {% if form.get('type') == 'saida' %}selected{% endif %}>Saída — retirar do estoque</option></select></div>
+      <div class="form-field"><label for="quantity">Quantidade <span class="required">*</span></label><input id="quantity" name="quantity" type="number" min="1" step="1" inputmode="numeric" required value="{{ form.get('quantity', '') }}"><small>Informe um número inteiro maior que zero.</small></div>
+    </div>
+    <div class="notice notice-info"><strong>Validação:</strong> o sistema não permite saída maior que o saldo disponível e não altera o estoque se a operação for recusada.</div>
+    <div class="form-actions"><button class="button button-primary" type="submit">Registrar movimentação</button><a class="button button-quiet" href="{{ url_for('main.dashboard') }}">Cancelar</a></div>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Histórico de movimentações{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">RASTREABILIDADE</p><h1>Histórico de movimentações</h1><p class="muted">Consulte as entradas e saídas registradas. São exibidos até 500 registros mais recentes.</p></div><a class="button button-primary" href="{{ url_for('main.new_movement') }}">+ Nova movimentação</a></section>
+<section class="panel" aria-labelledby="history-title">
+  <div class="section-heading"><div><h2 id="history-title">Movimentações registradas</h2></div></div>
+  <form class="search-form filter-form" method="get" action="{{ url_for('main.movement_history') }}">
+    <label for="product_id">Filtrar por produto</label>
+    <div class="search-controls"><select id="product_id" name="product_id"><option value="">Todos os produtos</option>{% for product in products %}<option value="{{ product.id }}" {% if selected_product|string == product.id|string %}selected{% endif %}>{{ product.name }} ({{ product.code }})</option>{% endfor %}</select><button class="button button-secondary" type="submit">Filtrar</button><a class="button button-quiet" href="{{ url_for('main.movement_history') }}">Limpar</a></div>
+  </form>
+  {% if movements %}
+  <div class="table-wrap"><table><caption class="sr-only">Histórico de entradas e saídas de produtos.</caption><thead><tr><th scope="col">Data e hora</th><th scope="col">Produto</th><th scope="col">Código</th><th scope="col">Tipo</th><th scope="col">Quantidade</th></tr></thead><tbody>{% for movement in movements %}<tr><td data-label="Data e hora">{{ movement.created_at[8:10] }}/{{ movement.created_at[5:7] }}/{{ movement.created_at[0:4] }} {{ movement.created_at[11:16] }}</td><td data-label="Produto"><strong>{{ movement.product_name }}</strong></td><td data-label="Código">{{ movement.product_code }}</td><td data-label="Tipo">{% if movement.type == 'entrada' %}<span class="status status-ok">Entrada</span>{% else %}<span class="status status-neutral">Saída</span>{% endif %}</td><td data-label="Quantidade">{{ movement.quantity }}</td></tr>{% endfor %}</tbody></table></div>
+  {% else %}<div class="empty-state"><h3>Nenhuma movimentação encontrada</h3><p>As movimentações registradas aparecerão aqui.</p><a class="button button-primary" href="{{ url_for('main.new_movement') }}">Registrar movimentação</a></div>{% endif %}
+</section>
+{% endblock %}
