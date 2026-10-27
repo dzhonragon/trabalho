@@ -99,3 +99,33 @@ def test_empty_and_non_integer_quantities_are_rejected(app, authenticated_client
         db = get_db()
         product = db.execute("SELECT quantity FROM products WHERE id = ?", (product_id,)).fetchone()
         assert product["quantity"] == 20
+
+def test_movement_rejects_unknown_product_without_changing_stock(
+    app, authenticated_client
+):
+    product_id = add_product(app, quantity=3)
+
+    response = authenticated_client.post(
+        "/movimentacoes/nova",
+        data={
+            "product_id": "99999",
+            "type": "saida",
+            "quantity": "1",
+        },
+    )
+
+    assert response.status_code == 400
+    assert "não existe" in response.get_data(as_text=True).lower()
+
+    with app.app_context():
+        db = get_db()
+        product = db.execute(
+            "SELECT quantity FROM products WHERE id = ?",
+            (product_id,),
+        ).fetchone()
+        movement_count = db.execute(
+            "SELECT COUNT(*) FROM movements"
+        ).fetchone()[0]
+
+        assert product["quantity"] == 3
+        assert movement_count == 0
