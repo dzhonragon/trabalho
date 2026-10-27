@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Cadastrar produto{% endblock %}
+{% block content %}
+<section class="page-heading compact-heading"><div><p class="eyebrow">CADASTRO</p><h1>Novo produto</h1><p class="muted">Preencha os dados do item para começar a controlar seu estoque.</p></div><a class="button button-quiet" href="{{ url_for('main.dashboard') }}">← Voltar ao estoque</a></section>
+<section class="panel form-panel" aria-labelledby="product-form-title">
+  <h2 id="product-form-title">Dados do produto</h2>
+  <form method="post" action="{{ url_for('main.new_product') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-grid">
+      <div class="form-field form-field-full"><label for="name">Nome do produto <span class="required">*</span></label><input id="name" name="name" type="text" maxlength="120" required value="{{ form.get('name', '') }}" autocomplete="off"><small>Ex.: Arroz 5 kg</small></div>
+      <div class="form-field"><label for="code">Código único <span class="required">*</span></label><input id="code" name="code" type="text" maxlength="40" required value="{{ form.get('code', '') }}" autocomplete="off"><small>Ex.: P001</small></div>
+      <div class="form-field"><label for="price">Preço unitário (R$) <span class="required">*</span></label><input id="price" name="price" type="number" min="0.01" step="0.01" required inputmode="decimal" value="{{ form.get('price', '') }}"></div>
+      <div class="form-field"><label for="quantity">Quantidade inicial <span class="required">*</span></label><input id="quantity" name="quantity" type="number" min="0" step="1" required inputmode="numeric" value="{{ form.get('quantity', '0') }}"><small>Pode ser zero.</small></div>
+      <div class="form-field"><label for="minimum_stock">Estoque mínimo <span class="required">*</span></label><input id="minimum_stock" name="minimum_stock" type="number" min="0" step="1" required inputmode="numeric" value="{{ form.get('minimum_stock', '0') }}"><small>O sistema alerta quando o saldo chega a este limite.</small></div>
+    </div>
+    <div class="form-actions"><button class="button button-primary" type="submit">Salvar produto</button><a class="button button-quiet" href="{{ url_for('main.dashboard') }}">Cancelar</a></div>
+  </form>
+</section>
+{% endblock %}

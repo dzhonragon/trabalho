@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{% block title %}Controle de Estoque{% endblock %} | Mercadinho</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo principal</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="{{ url_for('main.dashboard') if session_username else url_for('main.login') }}">
+        <span class="brand-mark" aria-hidden="true">ME</span>
+        <span><strong>Mercadinho</strong><small>Controle de estoque</small></span>
+      </a>
+      {% if session_username %}
+      <nav class="main-nav" aria-label="Navegação principal">
+        <a href="{{ url_for('main.dashboard') }}">Estoque</a>
+        <a href="{{ url_for('main.new_product') }}">Cadastrar produto</a>
+        <a href="{{ url_for('main.new_movement') }}">Movimentação</a>
+        <a href="{{ url_for('main.movement_history') }}">Histórico</a>
+      </nav>
+      <div class="account-area">
+        <span class="signed-user">Olá, {{ session_username }}</span>
+        <form action="{{ url_for('main.logout') }}" method="post" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="button button-quiet button-small" type="submit">Sair</button>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </header>
+  <main id="conteudo" class="page-shell">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <section class="flash-stack" aria-label="Mensagens do sistema" aria-live="polite">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+          <span class="flash-symbol" aria-hidden="true">{% if category == 'success' %}✓{% elif category == 'warning' %}⚠{% elif category == 'error' %}×{% else %}i{% endif %}</span>
+          <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+      </section>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <div class="footer-inner">MVP acadêmico • Dados de demonstração • Não utilizar para operações comerciais reais</div>
+  </footer>
+</body>
+</html>

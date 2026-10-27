@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Entrar{% endblock %}
+{% block content %}
+<section class="login-layout" aria-labelledby="login-title">
+  <div class="login-intro">
+    <p class="eyebrow">CONTROLE SIMPLES, ESTOQUE ORGANIZADO</p>
+    <h1 id="login-title">Entre no seu estoque.</h1>
+    <p>Consulte produtos, registre entradas e saídas e identifique itens que precisam de reposição.</p>
+    <ul class="benefit-list">
+      <li>Consulta de quantidades e estoque mínimo</li>
+      <li>Validação de movimentações</li>
+      <li>Histórico de entradas e saídas</li>
+    </ul>
+  </div>
+  <div class="panel login-panel">
+    <h2>Acessar sistema</h2>
+    <p class="muted">Use o usuário criado pelo administrador do projeto.</p>
+    <form method="post" action="{{ url_for('main.login', next=request.args.get('next', '')) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-field">
+        <label for="username">Usuário</label>
+        <input id="username" name="username" type="text" autocomplete="username" maxlength="80" required autofocus>
+      </div>
+      <div class="form-field">
+        <label for="password">Senha</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="button button-primary button-wide" type="submit">Entrar</button>
+    </form>
+    <p class="form-help">A conta é criada no terminal com o comando <code>flask --app mercadinho:create_app create-user</code>.</p>
+  </div>
+</section>
+{% endblock %}
